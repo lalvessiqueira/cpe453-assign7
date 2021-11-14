@@ -38,6 +38,7 @@ int main(int argc,char* argv[]) {
     for (i = 0; i < 256; i++) {
             pageTable[i] = -1;
     }
+
     /* Your program will read a file containing 
     several 32-bit integer numbers that represent logical
     addresses. However, you need only be concerned with 
@@ -51,6 +52,7 @@ int main(int argc,char* argv[]) {
      * bit masking = which bits you want to keep, and which bits you want to clear
      */
 
+// to use for masking!
     int maskPageNumber = 0;
     int maskPageOffset = 0;
     for (i = 0; i < 8; i++) {
@@ -63,7 +65,6 @@ int main(int argc,char* argv[]) {
     int saveAddress;
     //where we get the addresses from the file
     while (fscanf(fp, "%d", &saveAddress ) != EOF) {
-
 
     }
 
