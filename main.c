@@ -21,6 +21,7 @@ int TLB[16][2];
 void pageFault(int page){}
 
 int main(int argc,char* argv[]) {
+    int i;
     if(argc == 1){ 
         fprintf(stderr, "No file passed");
         return EXIT_FAILURE;
@@ -34,22 +35,35 @@ int main(int argc,char* argv[]) {
     }
 
     //initializing page table array
-    for (int i = 0; i < 256; i++) {
+    for (i = 0; i < 256; i++) {
             pageTable[i] = -1;
     }
-
-    int saveAddress;
-    //where we get the addresses from the file
-    while (fscanf(fp, "%d", &saveAddress ) != EOF) {
     /* Your program will read a file containing 
     several 32-bit integer numbers that represent logical
     addresses. However, you need only be concerned with 
     16-bit addresses, so you must mask the rightmost 16 bits 
     of each logical address. These 16 bits are divided 
     into:
-    */
-   //(1) an 8-bit page number
-   //(2) an 8-bit page offset.
+    * (1) an 8-bit page number
+    * (2) an 8-bit page offset. */
+
+    /** TODO: Mask the rightmost 16 bits of each logical address
+     * bit masking = which bits you want to keep, and which bits you want to clear
+     */
+
+    int maskPageNumber = 0;
+    int maskPageOffset = 0;
+    for (i = 0; i < 8; i++) {
+        //the first 8 bits
+        maskPageNumber = maskPageNumber | (1 << (i + 8));
+        //last 8 bits
+        maskPageOffset = maskPageOffset | (1 << i);
+    }
+
+    int saveAddress;
+    //where we get the addresses from the file
+    while (fscanf(fp, "%d", &saveAddress ) != EOF) {
+
 
     }
 
