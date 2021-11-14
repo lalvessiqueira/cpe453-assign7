@@ -21,7 +21,7 @@ int TLB[16][2];
 void pageFault(int page){}
 
 int main(int argc,char* argv[]) {
-    int i;
+    int i, pageNumber = 0, pageOffset = 0;
     if(argc == 1){ 
         fprintf(stderr, "No file passed");
         return EXIT_FAILURE;
@@ -62,9 +62,14 @@ int main(int argc,char* argv[]) {
         maskPageOffset = maskPageOffset | (1 << i);
     }
 
-    int saveAddress;
+    int savedLogicalAddress;
     //where we get the addresses from the file
-    while (fscanf(fp, "%d", &saveAddress ) != EOF) {
+    while (fscanf(fp, "%d", &savedLogicalAddress ) != EOF) {
+        
+        /** TODO: Perhaps the easiest way to do this is by 
+         * using the operators for bit-masking and bit-shifting. */
+        pageNumber = (maskPageNumber & savedLogicalAddress) >> 8;
+        pageOffset = maskPageOffset & savedLogicalAddress;
 
     }
 
