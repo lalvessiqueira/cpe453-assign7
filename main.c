@@ -9,11 +9,16 @@
  * stored at the translated physical address.
 */ 
 
+void pageFault(int page);
+
 int pageTable[256];
 
 //rows: 16 entries
 //column: page number x frame number
 int TLB[16][2];
+
+//function to resolve page faults
+void pageFault(int page){}
 
 int main(int argc,char* argv[]) {
     if(argc == 1){ 
