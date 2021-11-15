@@ -1,6 +1,6 @@
 #include<stdio.h> 
 #include <stdlib.h> 
-
+#include <string.h>
 /**
  * TODO: Your program will read from a file containing 
  * logical addresses and, using a TLB and a page table, 
@@ -12,14 +12,27 @@
 void pageFault(int page);
 
 int pageTable[256];
-
+char physicalMemory[256][256];
 //rows: 16 entries
 //column: page number x frame number
 int TLB[16][2];
-
 //function to resolve page faults
-void pageFault(int page){}
-
+void pageFault(int page){
+  char buffer[256];
+  int i, num=0;
+  FILE * fp = fopen("BACKING_STORE.bin", "rb");
+  fseek(fp, page*256, SEEK_SET);
+  fread(buffer, 256, 1, fp);
+  /*for(i= 0; i<256; i++){
+     printf("%d\n", buffer[i]);
+  }*/
+  for(i = 3; i >= 0; i--){
+     num += buffer[3-i] << 8*i;
+  }
+  printf("Num %d\n", num); 
+  strcpy(physicalMemory[(int)buffer[0]], buffer);
+  fclose(fp);
+}
 int main(int argc,char* argv[]) {
     int i, pageNumber = 0, pageOffset = 0;
     if(argc == 1){ 
@@ -70,8 +83,15 @@ int main(int argc,char* argv[]) {
          * using the operators for bit-masking and bit-shifting. */
         pageNumber = (maskPageNumber & savedLogicalAddress) >> 8;
         pageOffset = maskPageOffset & savedLogicalAddress;
-
+        int frameNumber = pageTable[pageNumber];
+        if(frameNumber == -1){
+           pageFault(pageNumber);
+           
+        }else{
+           int physicalAddress = (frameNumber << 8)+ pageOffset;
+           printf("%d\n", pageOffset);
+        }
     }
 
-
+    return 0;
 }
