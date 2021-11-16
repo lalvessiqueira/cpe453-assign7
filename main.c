@@ -12,25 +12,20 @@
 void pageFault(int page);
 
 int pageTable[256];
-char physicalMemory[256][256];
+char physicalMemory[256];
 //rows: 16 entries
 //column: page number x frame number
 int TLB[16][2];
+int counter = 0;
 //function to resolve page faults
 void pageFault(int page){
   char buffer[256];
-  int i, num=0;
   FILE * fp = fopen("BACKING_STORE.bin", "rb");
+  int num = 0, i;
   fseek(fp, page*256, SEEK_SET);
   fread(buffer, 256, 1, fp);
-  /*for(i= 0; i<256; i++){
-     printf("%d\n", buffer[i]);
-  }*/
-  for(i = 3; i >= 0; i--){
-     num += buffer[3-i] << 8*i;
-  }
-  printf("Num %d\n", num); 
-  strcpy(physicalMemory[(int)buffer[0]], buffer);
+  physicalMemory[counter]=buffer[0];
+  pageTable[page] = counter;
   fclose(fp);
 }
 int main(int argc,char* argv[]) {
@@ -86,10 +81,14 @@ int main(int argc,char* argv[]) {
         int frameNumber = pageTable[pageNumber];
         if(frameNumber == -1){
            pageFault(pageNumber);
-           
+           int physicalAddress = (counter << 8) + pageOffset;
+           char val = physicalMemory[pageTable[pageNumber]];
+           counter++;
+           printf("Address: %d Val: %d\n", physicalAddress, val); 
         }else{
            int physicalAddress = (frameNumber << 8)+ pageOffset;
-           printf("%d\n", pageOffset);
+           char val = physicalMemory[pageTable[pageNumber]];
+           printf("Address: %d Val: %d\n", physicalAddress, val);
         }
     }
 
