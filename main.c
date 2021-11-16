@@ -9,7 +9,6 @@
  * stored at the translated physical address.
 */ 
 
-void pageFault(int page);
 
 int pageTable[256];
 char physicalMemory[256];
@@ -18,13 +17,13 @@ char physicalMemory[256];
 int TLB[16][2];
 int counter = 0;
 //function to resolve page faults
-void pageFault(int page){
+void pageFault(int page, int logicalAddress){
   char buffer[256];
   FILE * fp = fopen("BACKING_STORE.bin", "rb");
   int num = 0, i;
-  fseek(fp, page*256, SEEK_SET);
-  fread(buffer, 256, 1, fp);
-  physicalMemory[counter]=buffer[0];
+  fseek(fp, logicalAddress, SEEK_SET);
+  fread(buffer, 1, 1, fp);
+  physicalMemory[counter]= buffer[0];
   pageTable[page] = counter;
   fclose(fp);
 }
@@ -80,14 +79,14 @@ int main(int argc,char* argv[]) {
         pageOffset = maskPageOffset & savedLogicalAddress;
         int frameNumber = pageTable[pageNumber];
         if(frameNumber == -1){
-           pageFault(pageNumber);
+           pageFault(pageNumber, savedLogicalAddress);
            int physicalAddress = (counter << 8) + pageOffset;
            char val = physicalMemory[pageTable[pageNumber]];
            counter++;
            printf("Address: %d Val: %d\n", physicalAddress, val); 
         }else{
            int physicalAddress = (frameNumber << 8)+ pageOffset;
-           char val = physicalMemory[pageTable[pageNumber]];
+           char val = physicalMemory[frameNumber];//this needs to change
            printf("Address: %d Val: %d\n", physicalAddress, val);
         }
     }
