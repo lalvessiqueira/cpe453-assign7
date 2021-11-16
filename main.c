@@ -11,7 +11,7 @@
 
 
 int pageTable[256];
-char physicalMemory[256];
+char physicalMemory[256][256];
 //rows: 16 entries
 //column: page number x frame number
 int TLB[16][2];
@@ -22,13 +22,13 @@ void pageFault(int page, int logicalAddress){
   FILE * fp = fopen("BACKING_STORE.bin", "rb");
   int num = 0, i;
   fseek(fp, logicalAddress, SEEK_SET);
-  fread(buffer, 1, 1, fp);
-  physicalMemory[counter]= buffer[0];
+  fread(buffer, 256, 1, fp);
+  strcpy(physicalMemory[counter],buffer);
   pageTable[page] = counter;
   fclose(fp);
 }
 int main(int argc,char* argv[]) {
-    int i, pageNumber = 0, pageOffset = 0;
+    int i, pageNumber = 0, pageOffset = 0, flag, frameNumber, fifo_bit=0;
     if(argc == 1){ 
         fprintf(stderr, "No file passed");
         return EXIT_FAILURE;
@@ -45,7 +45,10 @@ int main(int argc,char* argv[]) {
     for (i = 0; i < 256; i++) {
             pageTable[i] = -1;
     }
-
+    for(i = 0; i < 16; i++){
+        TLB[i][0]=-1;
+        TLB[i][1]=-1;
+    }
     /* Your program will read a file containing 
     several 32-bit integer numbers that represent logical
     addresses. However, you need only be concerned with 
@@ -72,21 +75,49 @@ int main(int argc,char* argv[]) {
     int savedLogicalAddress;
     //where we get the addresses from the file
     while (fscanf(fp, "%d", &savedLogicalAddress ) != EOF) {
-        
         /** TODO: Perhaps the easiest way to do this is by 
          * using the operators for bit-masking and bit-shifting. */
+        flag =0;
         pageNumber = (maskPageNumber & savedLogicalAddress) >> 8;
         pageOffset = maskPageOffset & savedLogicalAddress;
-        int frameNumber = pageTable[pageNumber];
+        for(i = 0; i < 16; i++){
+              if(TLB[i][0] == pageNumber){
+                  frameNumber = TLB[i][1];
+                  flag = 1;
+                  break;
+              }
+           }
+           if(!flag){
+              frameNumber = pageTable[pageNumber];
+              int j = 0;
+              while(TLB[j][0] != -1){
+                 j++;
+                 if(j >= 16){
+                    break;
+                 }
+              }
+              if(j < 16 && frameNumber != -1){
+                 TLB[j][0] = pageNumber;
+                 TLB[j][1] = frameNumber;           
+              }
+              else if(j >= 16 && frameNumber != -1){
+                 TLB[fifo_bit][0] = pageNumber;
+                 TLB[fifo_bit][1] = frameNumber;
+                 if(fifo_bit == 15)
+                    fifo_bit = 0;
+                 else
+                    fifo_bit++;
+              }
+           }
         if(frameNumber == -1){
            pageFault(pageNumber, savedLogicalAddress);
            int physicalAddress = (counter << 8) + pageOffset;
-           char val = physicalMemory[pageTable[pageNumber]];
+           char val = physicalMemory[counter][0];
            counter++;
            printf("Address: %d Val: %d\n", physicalAddress, val); 
         }else{
            int physicalAddress = (frameNumber << 8)+ pageOffset;
-           char val = physicalMemory[frameNumber];//this needs to change
+           char val = physicalMemory[frameNumber][0];//this needs to change
            printf("Address: %d Val: %d\n", physicalAddress, val);
         }
     }
