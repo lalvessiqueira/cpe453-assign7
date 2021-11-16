@@ -84,12 +84,12 @@ int main(int argc,char* argv[]) {
            int physicalAddress = (counter << 8) + pageOffset;
            char val = physicalMemory[pageTable[pageNumber]];
            counter++;
-           printf("Physical address: %d Value: %d\n", physicalAddress, val); 
+           printf("Virtual address: %d Physical address: %d Value: %d\n",savedLogicalAddress, physicalAddress, val); 
         }
         else {
            int physicalAddress = (frameNumber << 8)+ pageOffset;
            char val = physicalMemory[frameNumber];//this needs to change - yes
-           printf("Physical address: %d Value: %d\n", physicalAddress, val);
+           printf("Virtual address: %d Physical address: %d Value: %d\n",savedLogicalAddress, physicalAddress, val);
         }
     }
 
