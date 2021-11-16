@@ -20,7 +20,6 @@ int counter = 0;
 void pageFault(int page, int logicalAddress){
   char buffer[256];
   FILE * fp = fopen("BACKING_STORE.bin", "rb");
-  int num = 0, i;
   fseek(fp, logicalAddress, SEEK_SET);
   fread(buffer, 1, 1, fp);
   physicalMemory[counter]= buffer[0];
@@ -85,12 +84,12 @@ int main(int argc,char* argv[]) {
            int physicalAddress = (counter << 8) + pageOffset;
            char val = physicalMemory[pageTable[pageNumber]];
            counter++;
-           printf("Address: %d Val: %d\n", physicalAddress, val); 
+           printf("Physical address: %d Value: %d\n", physicalAddress, val); 
         }
         else {
            int physicalAddress = (frameNumber << 8)+ pageOffset;
            char val = physicalMemory[frameNumber];//this needs to change - yes
-           printf("Address: %d Val: %d\n", physicalAddress, val);
+           printf("Physical address: %d Value: %d\n", physicalAddress, val);
         }
     }
 
