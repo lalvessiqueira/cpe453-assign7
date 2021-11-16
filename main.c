@@ -79,6 +79,7 @@ int main(int argc,char* argv[]) {
         pageOffset = maskPageOffset & savedLogicalAddress;
         int frameNumber = pageTable[pageNumber];
 
+//dont we need to check for TLB hit/miss?
         if(frameNumber == -1) {
            pageFault(pageNumber, savedLogicalAddress);
            int physicalAddress = (counter << 8) + pageOffset;
@@ -88,7 +89,7 @@ int main(int argc,char* argv[]) {
         }
         else {
            int physicalAddress = (frameNumber << 8)+ pageOffset;
-           char val = physicalMemory[frameNumber];//this needs to change
+           char val = physicalMemory[frameNumber];//this needs to change - yes
            printf("Address: %d Val: %d\n", physicalAddress, val);
         }
     }
