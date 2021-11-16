@@ -78,13 +78,15 @@ int main(int argc,char* argv[]) {
         pageNumber = (maskPageNumber & savedLogicalAddress) >> 8;
         pageOffset = maskPageOffset & savedLogicalAddress;
         int frameNumber = pageTable[pageNumber];
-        if(frameNumber == -1){
+
+        if(frameNumber == -1) {
            pageFault(pageNumber, savedLogicalAddress);
            int physicalAddress = (counter << 8) + pageOffset;
            char val = physicalMemory[pageTable[pageNumber]];
            counter++;
            printf("Address: %d Val: %d\n", physicalAddress, val); 
-        }else{
+        }
+        else {
            int physicalAddress = (frameNumber << 8)+ pageOffset;
            char val = physicalMemory[frameNumber];//this needs to change
            printf("Address: %d Val: %d\n", physicalAddress, val);
