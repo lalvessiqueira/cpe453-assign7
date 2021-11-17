@@ -1,22 +1,12 @@
 #include<stdio.h> 
 #include <stdlib.h> 
 #include <string.h>
-/**
- * TODO: Your program will read from a file containing 
- * logical addresses and, using a TLB and a page table, 
- * will translate each logical address to its corresponding 
- * physical address and output the value of the byte 
- * stored at the translated physical address.
-*/ 
-
 
 int pageTable[256];
 char physicalMemory[256][256];
-//rows: 16 entries
-//column: page number x frame number
 int TLB[16][2];
 int counter = 0;
-//function to resolve page faults
+
 void pageFault(int page, int logicalAddress){
   char buffer[256];
   FILE * fp = fopen("BACKING_STORE.bin", "rb");
@@ -40,7 +30,6 @@ int main(int argc,char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    //initializing page table array
     for (i = 0; i < 256; i++) {
             pageTable[i] = -1;
     }
@@ -48,34 +37,15 @@ int main(int argc,char* argv[]) {
         TLB[i][0]=-1;
         TLB[i][1]=-1;
     }
-    /* Your program will read a file containing 
-    several 32-bit integer numbers that represent logical
-    addresses. However, you need only be concerned with 
-    16-bit addresses, so you must mask the rightmost 16 bits 
-    of each logical address. These 16 bits are divided 
-    into:
-    * (1) an 8-bit page number
-    * (2) an 8-bit page offset. */
-
-    /** TODO: Mask the rightmost 16 bits of each logical address
-     * bit masking = which bits you want to keep, and which bits you want to clear
-     */
-
-// to use for masking!
     int maskPageNumber = 0;
     int maskPageOffset = 0;
     for (i = 0; i < 8; i++) {
-        //the first 8 bits
         maskPageNumber = maskPageNumber | (1 << (i + 8));
-        //last 8 bits
         maskPageOffset = maskPageOffset | (1 << i);
     }
 
     int savedLogicalAddress;
-    //where we get the addresses from the file
     while (fscanf(fp, "%d", &savedLogicalAddress ) != EOF) {
-        /** TODO: Perhaps the easiest way to do this is by 
-         * using the operators for bit-masking and bit-shifting. */
         flag =0;
         pageNumber = (maskPageNumber & savedLogicalAddress) >> 8;
         pageOffset = maskPageOffset & savedLogicalAddress;
@@ -116,7 +86,7 @@ int main(int argc,char* argv[]) {
            printf("Virtual Address: %d Physical Address: %d Value: %d\n", savedLogicalAddress, physicalAddress, val); 
         }else{
            int physicalAddress = (frameNumber << 8)+ pageOffset;
-           char val = physicalMemory[frameNumber][0];//this needs to change
+           char val = physicalMemory[frameNumber][0]; 
            printf("Virtual Address: %d Physical Address: %d Value: %d\n", savedLogicalAddress, physicalAddress, val);
         }
     }
